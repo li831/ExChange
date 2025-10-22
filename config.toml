@@ -4,7 +4,7 @@ log_level = "info"
 
 [binance]
 api_endpoint = "https://testnet.binance.vision"
-ws_endpoint = "wss://testnet.binance.vision/ws"
+ws_endpoint = "wss://stream.binance.com:9443/ws"
 
 [trading]
 symbols = ["BTCUSDT", "ETHUSDT"]
