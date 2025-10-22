@@ -1,5 +1,30 @@
 use std::collections::VecDeque;
 
+/// Calculate SMA for a price array (stateless version for strategies)
+pub fn sma(prices: &[f64], period: usize) -> Vec<f64> {
+    if prices.len() < period || period == 0 {
+        return vec![];
+    }
+
+    let mut result = Vec::new();
+    for i in (period - 1)..prices.len() {
+        let start = i + 1 - period;
+        let sum: f64 = prices[start..=i].iter().sum();
+        result.push(sum / period as f64);
+    }
+    result
+}
+
+/// Check if fast line crosses above slow line (bullish crossover)
+pub fn is_crossover(fast_prev: &f64, fast_curr: &f64, slow_prev: &f64, slow_curr: &f64) -> bool {
+    fast_prev <= slow_prev && fast_curr > slow_curr
+}
+
+/// Check if fast line crosses below slow line (bearish crossunder)
+pub fn is_crossunder(fast_prev: &f64, fast_curr: &f64, slow_prev: &f64, slow_curr: &f64) -> bool {
+    fast_prev >= slow_prev && fast_curr < slow_curr
+}
+
 /// Common interface for all indicators
 pub trait Indicator {
     /// Update the indicator with a new value
