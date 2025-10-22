@@ -19,6 +19,8 @@ pub struct GeneralConfig {
 pub struct BinanceConfig {
     pub api_endpoint: String,
     pub ws_endpoint: String,
+    pub api_key: Option<String>,
+    pub secret_key: Option<String>,
 }
 
 #[derive(Debug, Deserialize, Clone)]
@@ -55,6 +57,8 @@ impl AppConfig {
             binance: BinanceConfig {
                 api_endpoint: "https://testnet.binance.vision".to_string(),
                 ws_endpoint: "wss://testnet.binance.vision/ws".to_string(),
+                api_key: None,
+                secret_key: None,
             },
             trading: TradingConfig {
                 symbols: vec!["BTCUSDT".to_string()],
