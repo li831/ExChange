@@ -522,3 +522,55 @@
   祝你开发顺利！🎉
 
   如果在开发过程中遇到任何问题，随时可以参考这两份文档，或者提出具体的技术问题进行讨论。建议现在就开始 Phase 1 的第一个任务！
+  
+  订购新的日本服务器作为梯子
+  密码  uYGYGYrj@#$^#@ijdkjkds38uedijs     IP  45.95.226.114
+  
+  ########################################################################
+                       IP质量体检报告：45.95.*.*
+                   https://github.com/xykt/IPQuality
+                bash <(curl -sL https://Check.Place) -I
+        报告时间：2025-10-22 20:29:14 CST  脚本版本：v2025-09-19
+########################################################################
+一、基础信息（Maxmind 数据库）
+自治系统号：            AS139293
+组织：                  UFO Network Limited
+坐标：                  139°41′24″E, 35°41′21″N
+地图：                  https://check.place/35.6893,139.6899,15,cn
+城市：                  东京都, 东京, 151-0053
+使用地：                [HK]香港, [AS]亚洲
+注册地：                [DE]德国
+时区：                  Asia/Tokyo
+IP类型：                 广播IP
+二、IP类型属性
+数据库：      IPinfo    ipregistry    ipapi    IP2Location   AbuseIPDB
+使用类型：     机房        机房        机房        机房        机房
+公司类型：     机房        机房        商业        机房
+三、风险评分
+风险等级：      极低         低       中等       高         极高
+IP2Location：   3|低风险
+ipapi：    0.00%|极低风险
+AbuseIPDB：    0|低风险
+IPQS：                        75|可疑IP
+DB-IP：         |低风险
+四、风险因子
+库： IP2Location ipapi ipregistry IPQS SCAMALYTICS ipdata IPinfo IPWHOIS
+地区：    [JP]    [HK]    [JP]    [JP]     无     [JP]    [HK]    [JP]
+代理：     否      否      否      是      无      否      否      否
+Tor：      否      否      否      否      无      否      否      否
+VPN：      否      否      否      是      无      无      否      否
+服务器：   是      是      是      无      无      否      是      否
+滥用：     否      否      否      否      无      否      无      无
+机器人：   否      否      无      否      无      无      无      无
+五、流媒体及AI服务解锁检测
+服务商：  TikTok   Disney+  Netflix Youtube  AmazonPV  Spotify  ChatGPT
+状态：     解锁     解锁     解锁     解锁     解锁     屏蔽     仅APP
+地区：     [JP]     [JP]     [JP]     [HK]     [JP]              [JP]
+方式：     原生     原生     原生     原生     原生              原生
+六、邮局连通性及黑名单检测
+本地25端口出站：可用
+通信：+Gmail+Outlook+Yahoo+Apple+QQ+MailRU+AOL-GMX-MailCOM+163-Sohu+Sina
+IP地址黑名单数据库：  有效 439   正常 415   已标记 24   黑名单 0
+========================================================================
+今日IP检测量：1620；总检测量：662863。感谢使用xy系列脚本！
+报告链接：https://Report.Check.Place/ip/27YQ857ZG.svg
