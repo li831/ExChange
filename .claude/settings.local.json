@@ -1,0 +1,11 @@
+{
+  "enabledMcpjsonServers": [
+    "vibedev-specs",
+    "context7",
+    "sequential-thinking",
+    "@21st-dev/magic",
+    "Software Planning Tool",
+    "brave-search"
+  ],
+  "enableAllProjectMcpServers": true
+}

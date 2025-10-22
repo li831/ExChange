@@ -1,0 +1,49 @@
+{
+  "mcpServers": {
+    "vibedev-specs": {
+      "command": "cmd",
+      "args": ["/c npx vibedev-specs-mcp@latest"],
+      "env": {},
+      "disabled": false
+    },
+    "context7": {
+      "command": "cmd",
+      "args": ["/c npx @upstash/context7-mcp --api-key ctx7sk-8b0e44aa-88db-4eaa-a469-46d33c130133"],
+      "env": {},
+      "disabled": false
+    },
+    "sequential-thinking": {
+      "command": "cmd",
+      "args": ["/c npx @modelcontextprotocol/server-sequential-thinking"],
+      "env": {},
+      "disabled": false
+    },
+    "@21st-dev/magic": {
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "@21st-dev/magic@latest",
+        "API_KEY=\"75f20b48cb6ec881cdc5ccafae3df8dc659e2d0fe63aec81fd4cb46a46a62102\""
+      ]
+    },
+    "Software Planning Tool": {
+      "command": "cmd",
+      "args": ["/c npx NightTrek/Software-planning-mcp"],
+      "env": {},
+      "disabled": false
+    },
+    "brave-search": {
+      "command": "cmd",
+      "args": [
+        "/c",
+		"npx",
+        "brave-search-mcp"
+      ],
+      "env": {
+        "BRAVE_API_KEY": "BSAbkxBVDOshbHuigeJn3FbdpFXeKCn"
+      }
+    }
+  }
+}
