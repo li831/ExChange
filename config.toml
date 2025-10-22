@@ -1,0 +1,17 @@
+[general]
+environment = "development"
+log_level = "info"
+
+[binance]
+api_endpoint = "https://testnet.binance.vision"
+ws_endpoint = "wss://testnet.binance.vision/ws"
+
+[trading]
+symbols = ["BTCUSDT", "ETHUSDT"]
+capital_allocation = 0.7
+
+[risk]
+max_position_per_symbol = 0.3
+max_single_loss = 0.01
+max_daily_loss = 0.03
+stop_loss_multiplier = 1.5
