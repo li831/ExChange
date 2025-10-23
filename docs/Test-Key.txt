@@ -4,3 +4,9 @@ Save these values right now. They won't be shown ever again!
 API Key: UVZX8fCMFsKjE26ptGEKiwPhxDzIysCoEUhVjWlySmAr0HXQzbs7NOSIiLKgOVuR
 
 Secret Key: EKLwVzhXT93oAdmhK7AB6tegJfH4acGLNlAPXgzFeQzuy02Y35n947uwGZSDNIiq
+
+
+
+
+telegram_bot_token = "8393941478:AAGyQyc-9ssMMYun4CMJVNvDaitU8LP6afc"
+telegram_chat_id = "7190368243"
