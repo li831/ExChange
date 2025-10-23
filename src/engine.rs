@@ -11,12 +11,14 @@ use anyhow::Result;
 use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::RwLock;
-use tracing::{debug, error, info, warn};
+use tracing::{debug, info, warn};
 
 pub struct TradingEngine {
     config: AppConfig,
+    #[allow(dead_code)]
     binance_client: BinanceClient,
     websocket: BinanceWebSocket,
+    #[allow(dead_code)]
     orderbooks: Arc<RwLock<HashMap<String, OrderBook>>>,
     strategy: Box<dyn Strategy + Send + Sync>,
     risk_manager: Arc<RwLock<RiskManager>>,
