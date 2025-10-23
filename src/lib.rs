@@ -2,6 +2,7 @@ pub mod binance;
 pub mod config;
 pub mod indicators;
 pub mod logging;
+pub mod monitoring;
 pub mod orderbook;
 pub mod risk;
 pub mod strategy;

@@ -7,6 +7,7 @@ pub struct AppConfig {
     pub binance: BinanceConfig,
     pub trading: TradingConfig,
     pub risk: RiskConfig,
+    pub monitoring: MonitoringConfig,
 }
 
 #[derive(Debug, Deserialize, Clone)]
@@ -35,6 +36,13 @@ pub struct RiskConfig {
     pub max_single_loss: f64,
     pub max_daily_loss: f64,
     pub stop_loss_multiplier: f64,
+}
+
+#[derive(Debug, Deserialize, Clone)]
+pub struct MonitoringConfig {
+    pub telegram_bot_token: String,
+    pub telegram_chat_id: String,
+    pub enable_alerts: bool,
 }
 
 impl AppConfig {
@@ -69,6 +77,11 @@ impl AppConfig {
                 max_single_loss: 0.01,
                 max_daily_loss: 0.03,
                 stop_loss_multiplier: 1.5,
+            },
+            monitoring: MonitoringConfig {
+                telegram_bot_token: String::new(),
+                telegram_chat_id: String::new(),
+                enable_alerts: false,
             },
         }
     }

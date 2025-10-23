@@ -15,3 +15,8 @@ max_position_per_symbol = 0.3
 max_single_loss = 0.01
 max_daily_loss = 0.03
 stop_loss_multiplier = 1.5
+
+[monitoring]
+telegram_bot_token = ""
+telegram_chat_id = ""
+enable_alerts = true
