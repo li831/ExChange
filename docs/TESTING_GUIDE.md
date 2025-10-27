@@ -144,13 +144,15 @@ INFO trading_engine::websocket: Subscribing to streams: ["btcusdt@trade", "ethus
 INFO trading_engine::engine: 📡 Subscribed to market data streams
 ```
 
-**实时数据日志** (运行中):
+**实时数据日志** (运行中，采样记录，每10次更新记录一次):
 ```
-DEBUG trading_engine::engine: BTCUSDT - Price: 95234.56
-DEBUG trading_engine::engine: ETHUSDT - Price: 3421.78
-DEBUG trading_engine::engine: BTCUSDT - Price: 95235.12
+INFO trading_engine::engine: 📊 BTCUSDT - Price: 95234.56 | Buffer: 15/100 | Total received: 100
+INFO trading_engine::engine: 📊 ETHUSDT - Price: 3421.78 | Buffer: 12/100 | Total received: 80
+INFO trading_engine::engine: 📊 BTCUSDT - Price: 95235.12 | Buffer: 18/100 | Total received: 110
 ...
 ```
+
+**说明**: 价格数据采用 1:10 采样记录，即每接收10次价格更新记录1次日志，避免日志量过大
 
 ### 数据收集:
 
@@ -159,7 +161,7 @@ DEBUG trading_engine::engine: BTCUSDT - Price: 95235.12
 WebSocket 连接成功: 是/否
 订阅成功: 是/否
 开始接收数据时间: ________ 秒后
-数据更新频率: 每秒约 ________ 条
+价格日志显示频率: 每个交易对约每 ________ 秒显示一次 (实际接收频率是10倍)
 ```
 
 **观察时长**: 至少运行 **5 分钟**
@@ -189,23 +191,29 @@ WebSocket 连接成功: 是/否
 
 ```bash
 cd trading-engine
-RUST_LOG=debug cargo run
+RUST_LOG=info cargo run
 ```
+
+**注意**: 使用 `RUST_LOG=info` 级别即可看到完整的价格数据、数据积累过程和策略计算过程，无需使用 debug 级别。
 
 **测试时长**: 至少运行 **30 分钟** (策略每 60 秒检查一次)
 
 ### 预期结果:
 
-**价格数据积累** (前 10 分钟):
+**价格数据积累** (前 20 分钟，每60秒检查一次):
 ```
-DEBUG trading_engine::engine: BTCUSDT: Insufficient price data (15)
-DEBUG trading_engine::engine: ETHUSDT: Insufficient price data (12)
+INFO trading_engine::engine: 🔍 Checking strategy signals...
+INFO trading_engine::engine: ⏳ BTCUSDT: Accumulating data... (15/20 required)
+INFO trading_engine::engine: ⏳ ETHUSDT: Accumulating data... (12/20 required)
 ...
 ```
 
 **策略开始工作** (约 20 分钟后，当积累足够数据):
 ```
-DEBUG trading_engine::strategy::dual_ma: MA values - Fast: 95234.50 -> 95236.20, Slow: 95220.10 -> 95225.30
+INFO trading_engine::engine: 🔍 Checking strategy signals...
+INFO trading_engine::engine: ✅ BTCUSDT: Ready - 25 prices buffered, Latest: 95234.56
+INFO trading_engine::strategy::dual_ma: 📐 MA Analysis - Fast: 95234.50 -> 95236.20, Slow: 95220.10 -> 95225.30 | Diff: 10.90 (Δ+2.40)
+INFO trading_engine::engine: ➖ BTCUSDT - No signal (waiting for crossover)
 ```
 
 **可能生成信号** (取决于市场走势):
