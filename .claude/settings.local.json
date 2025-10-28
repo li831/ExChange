@@ -7,7 +7,8 @@
       "WebFetch(domain:github.com)",
       "Skill(superpowers:executing-plans)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Skill(superpowers:writing-plans)"
     ]
   },
   "enableAllProjectMcpServers": true,
