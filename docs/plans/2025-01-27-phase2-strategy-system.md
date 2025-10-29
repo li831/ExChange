@@ -12,7 +12,7 @@
 
 ## 📊 实施进度 (开始时间: 2025-01-27)
 
-### 总体进度: 4/14 任务完成 (29%)
+### 总体进度: 7/14 任务完成 (50%) 🎉
 
 | Task | 状态 | 预计天数 | 测试数量 | Git Commit |
 |------|------|----------|----------|------------|
@@ -20,9 +20,9 @@
 | Task 2: 词法分析器 | ✅ 已完成 | 1.5天 | 6个 | e0de6ec |
 | Task 3: AST生成器 | ✅ 已完成 | 1.5天 | 8个 | 5dc24cf |
 | Task 4: 基础指标实现 | ✅ 已完成 | 2天 | 13个 | e12c70d |
-| Task 5: 指标注册系统 | ⏳ 待开始 | 1天 | - | - |
-| Task 6: 指标缓存优化 | ⏳ 待开始 | 1天 | - | - |
-| Task 7: AST执行器 | ⏳ 待开始 | 2天 | - | - |
+| Task 5: 指标注册系统 | ✅ 已完成 | 1天 | 6个 | de8f330 |
+| Task 6: 指标缓存优化 | ✅ 已完成 | 1天 | 6个 | 6adae1e |
+| Task 7: AST执行器 | ✅ 已完成 | 2天 | 6个 | 82c7e4e |
 | Task 8: 策略函数实现 | ⏳ 待开始 | 1.5天 | - | - |
 | Task 9: 内置函数库 | ⏳ 待开始 | 1.5天 | - | - |
 | Task 10: Freqtrade环境 | ⏳ 待开始 | 0.5天 | - | - |
@@ -32,10 +32,10 @@
 | Task 14: 多策略管理 | ⏳ 待开始 | 1天 | - | - |
 
 ### 关键指标
-- **目标测试数**: 100+ 单元测试 (当前: 32个)
-- **DSL覆盖度**: Pine Script v5核心功能的60% (当前: 语法解析完成)
+- **目标测试数**: 100+ 单元测试 (当前: 50个)
+- **DSL覆盖度**: Pine Script v5核心功能的60% (当前: 解析器+执行器完成)
 - **回测一致性**: 与Freqtrade信号一致性>95% (待实现)
-- **性能目标**: 1000数据点指标计算<1ms (✅ 已达成: 313ns/点)
+- **性能目标**: 1000数据点指标计算<1ms (✅ 已达成: 313ns/点，缓存后9.7µs)
 - **开发方法**: TDD + 增量集成 ✅
 
 ---
@@ -1676,14 +1676,28 @@ git commit -m "feat: implement comprehensive technical indicators library"
 
 ---
 
-## Task 5: 指标注册系统
+## Task 5: 指标注册系统 ✅
+
+**状态**: ✅ 已完成 (2025-10-28)
+**Git Commit**: de8f330
+**测试数量**: 6个单元测试，100%通过
 
 **Goal:** 构建动态指标注册和调用系统，支持运行时指标管理
 
-**Files:**
-- Create: `trading-engine/src/indicators/registry.rs`
-- Modify: `trading-engine/src/indicators/mod.rs`
-- Create: `trading-engine/tests/indicator_registry_test.rs`
+**实施总结:**
+- ✅ 实现了 `IndicatorFn` trait 统一指标接口
+- ✅ 创建了 `IndicatorRegistry` 动态注册中心
+- ✅ 实现了 `SimpleIndicator` 函数式包装器
+- ✅ 预注册了4个内置指标：SMA, EMA, WMA, RSI
+- ✅ 支持动态指标查找、参数验证、错误处理
+- ✅ 添加了完整的测试覆盖（6个测试用例）
+
+**已创建文件:**
+- ✅ `trading-engine/src/indicators/registry.rs` (162行)
+- ✅ `trading-engine/tests/indicator_registry_test.rs` (73行)
+
+**已修改文件:**
+- ✅ `trading-engine/src/indicators/mod.rs` (添加 registry 模块导出)
 
 ### Step 1: 定义Indicator trait接口
 
@@ -2008,14 +2022,34 @@ EOF
 
 ---
 
-## Task 6: 指标缓存优化
+## Task 6: 指标缓存优化 ✅
+
+**状态**: ✅ 已完成 (2025-10-28)
+**Git Commit**: 6adae1e
+**测试数量**: 6个单元测试，100%通过
 
 **Goal:** 实现指标计算结果缓存，支持增量更新，提升性能
 
-**Files:**
-- Create: `trading-engine/src/indicators/cache.rs`
-- Modify: `trading-engine/src/indicators/mod.rs`
-- Create: `trading-engine/tests/indicator_cache_test.rs`
+**实施总结:**
+- ✅ 实现了 `IndicatorCache` LRU缓存系统
+- ✅ 创建了 `CacheKey` 智能缓存键（基于指标名、参数、数据哈希）
+- ✅ 实现了 `CachedIndicatorRegistry` 线程安全包装器（RwLock）
+- ✅ TTL过期机制（默认5分钟）
+- ✅ LRU驱逐策略（默认最多1000条目）
+- ✅ 添加了完整的测试覆盖（6个测试用例）
+
+**性能提升:**
+- 🚀 缓存命中性能提升: **568倍** (5.5ms → 9.7µs，10K数据点)
+- 智能数据哈希：仅使用最后100个点，减少计算开销
+- 零成本抽象：不使用缓存时无额外性能损失
+
+**已创建文件:**
+- ✅ `trading-engine/src/indicators/cache.rs` (139行)
+- ✅ `trading-engine/tests/indicator_cache_test.rs` (115行)
+
+**已修改文件:**
+- ✅ `trading-engine/src/indicators/registry.rs` (+63行，添加 CachedIndicatorRegistry)
+- ✅ `trading-engine/src/indicators/mod.rs` (添加 cache 模块导出)
 
 ### Step 1: 定义缓存键和数据结构
 
@@ -2413,15 +2447,40 @@ EOF
 
 ---
 
-## Task 7: AST执行器
+## Task 7: AST执行器 ✅
+
+**状态**: ✅ 已完成 (2025-10-28)
+**Git Commit**: 82c7e4e
+**测试数量**: 6个单元测试，100%通过
 
 **Goal:** 实现Pine Script AST解释器，能够执行策略逻辑并生成交易信号
 
-**Files:**
-- Create: `trading-engine/src/strategy/executor.rs`
-- Create: `trading-engine/src/strategy/context.rs`
-- Modify: `trading-engine/src/strategy/mod.rs`
-- Create: `trading-engine/tests/ast_executor_test.rs`
+**实施总结:**
+- ✅ 实现了 `ExecutionContext` 策略执行上下文
+- ✅ 实现了 `MarketData` 市场数据快照（OHLCV）
+- ✅ 实现了 `ASTExecutor` 完整的AST解释执行器
+- ✅ 支持所有语句类型（赋值、if/else、策略调用）
+- ✅ 支持所有表达式类型（字面量、变量、函数调用、二元运算）
+- ✅ 集成技术指标调用（ta.*）
+- ✅ 支持数学函数（math.abs, math.max, math.min）
+- ✅ 支持内置变量（close, open, high, low, volume）
+- ✅ 实现策略信号生成（Long, Short, CloseLong, CloseShort）
+
+**核心功能:**
+- 语句执行：赋值、条件分支、策略调用
+- 表达式求值：支持嵌套和复杂表达式
+- 二元运算符：算术（+, -, *, /, %）、比较（>, <, >=, <=, ==, !=）、逻辑（and, or）
+- 函数调用：ta.sma/ema/rsi, input(), math.abs/max/min
+- 类型系统：Integer, Float, Boolean, String
+- 错误处理：完善的运行时错误检查
+
+**已创建文件:**
+- ✅ `trading-engine/src/strategy/executor.rs` (392行)
+- ✅ `trading-engine/src/strategy/context.rs` (110行)
+- ✅ `trading-engine/tests/ast_executor_test.rs` (173行)
+
+**已修改文件:**
+- ✅ `trading-engine/src/strategy/mod.rs` (添加 executor 和 context 模块)
 
 ### Step 1: 定义执行上下文
 
@@ -3076,6 +3135,1303 @@ Features:
 - Support for array destructuring
 
 Tests: 4 new tests covering assignments, indicators, conditionals, and operators
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+EOF
+)"
+```
+
+---
+
+## Task 8: 策略函数实现
+
+**状态**: ⏳ 待开始
+**预估时间**: 2天
+**测试数量**: 8个单元测试
+**依赖**: Task 7 (AST执行器)
+
+**Goal:** 实现核心策略函数 `strategy.entry()`, `strategy.close()`, `strategy.exit()`，使Pine Script能够生成实际的交易信号
+
+**Files:**
+- Create: `trading-engine/src/strategy/functions.rs` (新建策略函数模块)
+- Modify: `trading-engine/src/strategy/executor.rs:100-150` (集成策略函数)
+- Modify: `trading-engine/src/strategy/ast.rs:80-100` (添加Signal类型定义)
+- Test: `trading-engine/tests/strategy_functions_test.rs` (策略函数测试)
+
+### Step 1: 定义信号类型
+
+**文件: `src/strategy/ast.rs`**
+
+在文件末尾添加:
+
+```rust
+/// 交易信号类型
+#[derive(Debug, Clone, PartialEq)]
+pub enum Signal {
+    /// 开多仓
+    Long { id: String, quantity: Option<f64> },
+
+    /// 开空仓
+    Short { id: String, quantity: Option<f64> },
+
+    /// 平多仓
+    CloseLong { id: String },
+
+    /// 平空仓
+    CloseShort { id: String },
+
+    /// 退出(带止损止盈)
+    Exit {
+        id: String,
+        stop_loss: Option<f64>,
+        take_profit: Option<f64>,
+    },
+}
+
+impl Signal {
+    pub fn id(&self) -> &str {
+        match self {
+            Signal::Long { id, .. } => id,
+            Signal::Short { id, .. } => id,
+            Signal::CloseLong { id } => id,
+            Signal::CloseShort { id } => id,
+            Signal::Exit { id, .. } => id,
+        }
+    }
+}
+```
+
+**验证**: 运行 `cargo build`，确保编译通过
+
+**预期输出**: `Compiling trading-engine v0.1.0`
+
+### Step 2: 实现策略函数模块
+
+**文件: `src/strategy/functions.rs`**
+
+创建新文件:
+
+```rust
+use crate::strategy::ast::{Value, Signal};
+use anyhow::{Result, anyhow};
+
+/// 策略函数处理器
+pub struct StrategyFunctions;
+
+impl StrategyFunctions {
+    /// strategy.entry() - 开仓
+    /// 参数: (id: string, direction: string, qty?: float)
+    pub fn entry(args: &[Value]) -> Result<Signal> {
+        if args.len() < 2 {
+            return Err(anyhow!("strategy.entry requires at least 2 arguments: id and direction"));
+        }
+
+        let id = match &args[0] {
+            Value::String(s) => s.clone(),
+            _ => return Err(anyhow!("First argument (id) must be a string")),
+        };
+
+        let direction = match &args[1] {
+            Value::String(s) => s.as_str(),
+            _ => return Err(anyhow!("Second argument (direction) must be a string")),
+        };
+
+        let quantity = if args.len() > 2 {
+            match &args[2] {
+                Value::Float(f) => Some(*f),
+                Value::Integer(i) => Some(*i as f64),
+                _ => None,
+            }
+        } else {
+            None
+        };
+
+        match direction {
+            "long" => Ok(Signal::Long { id, quantity }),
+            "short" => Ok(Signal::Short { id, quantity }),
+            _ => Err(anyhow!("Direction must be 'long' or 'short', got: {}", direction)),
+        }
+    }
+
+    /// strategy.close() - 平仓
+    /// 参数: (id: string)
+    pub fn close(args: &[Value]) -> Result<Signal> {
+        if args.is_empty() {
+            return Err(anyhow!("strategy.close requires 1 argument: id"));
+        }
+
+        let id = match &args[0] {
+            Value::String(s) => s.clone(),
+            _ => return Err(anyhow!("Argument (id) must be a string")),
+        };
+
+        // 默认平多仓（最常见场景）
+        Ok(Signal::CloseLong { id })
+    }
+
+    /// strategy.exit() - 退出(带止损止盈)
+    /// 参数: (id: string, stop_loss?: float, take_profit?: float)
+    pub fn exit(args: &[Value]) -> Result<Signal> {
+        if args.is_empty() {
+            return Err(anyhow!("strategy.exit requires at least 1 argument: id"));
+        }
+
+        let id = match &args[0] {
+            Value::String(s) => s.clone(),
+            _ => return Err(anyhow!("First argument (id) must be a string")),
+        };
+
+        let stop_loss = if args.len() > 1 {
+            match &args[1] {
+                Value::Float(f) => Some(*f),
+                Value::Integer(i) => Some(*i as f64),
+                _ => None,
+            }
+        } else {
+            None
+        };
+
+        let take_profit = if args.len() > 2 {
+            match &args[2] {
+                Value::Float(f) => Some(*f),
+                Value::Integer(i) => Some(*i as f64),
+                _ => None,
+            }
+        } else {
+            None
+        };
+
+        Ok(Signal::Exit { id, stop_loss, take_profit })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_entry_long() {
+        let args = vec![
+            Value::String("MyLong".to_string()),
+            Value::String("long".to_string()),
+        ];
+        let signal = StrategyFunctions::entry(&args).unwrap();
+        assert_eq!(signal, Signal::Long {
+            id: "MyLong".to_string(),
+            quantity: None
+        });
+    }
+
+    #[test]
+    fn test_entry_short_with_quantity() {
+        let args = vec![
+            Value::String("MyShort".to_string()),
+            Value::String("short".to_string()),
+            Value::Float(0.5),
+        ];
+        let signal = StrategyFunctions::entry(&args).unwrap();
+        assert_eq!(signal, Signal::Short {
+            id: "MyShort".to_string(),
+            quantity: Some(0.5)
+        });
+    }
+
+    #[test]
+    fn test_close() {
+        let args = vec![Value::String("MyPosition".to_string())];
+        let signal = StrategyFunctions::close(&args).unwrap();
+        assert_eq!(signal, Signal::CloseLong {
+            id: "MyPosition".to_string()
+        });
+    }
+
+    #[test]
+    fn test_exit_with_stops() {
+        let args = vec![
+            Value::String("MyPos".to_string()),
+            Value::Float(45000.0), // stop loss
+            Value::Float(55000.0), // take profit
+        ];
+        let signal = StrategyFunctions::exit(&args).unwrap();
+        assert_eq!(signal, Signal::Exit {
+            id: "MyPos".to_string(),
+            stop_loss: Some(45000.0),
+            take_profit: Some(55000.0),
+        });
+    }
+}
+```
+
+**验证**: 运行测试
+
+```bash
+cargo test strategy::functions
+```
+
+**预期输出**: `test result: ok. 4 passed`
+
+### Step 3: 集成到AST执行器
+
+**文件: `src/strategy/executor.rs`**
+
+在文件顶部添加导入:
+
+```rust
+use crate::strategy::functions::StrategyFunctions;
+```
+
+修改 `call_function` 方法，添加策略函数分支:
+
+找到这段代码（约在第150行）:
+
+```rust
+fn call_function(&mut self, namespace: Option<String>, name: String, args: Vec<Expression>)
+    -> Result<Option<Signal>>
+{
+    let arg_values: Result<Vec<Value>> = args.iter()
+        .map(|arg| self.eval_expression(arg))
+        .collect();
+    let arg_values = arg_values?;
+```
+
+在这段代码后面添加策略函数处理:
+
+```rust
+    // 处理策略命名空间函数
+    if namespace.as_deref() == Some("strategy") {
+        return match name.as_str() {
+            "entry" => {
+                let signal = StrategyFunctions::entry(&arg_values)?;
+                Ok(Some(signal))
+            }
+            "close" => {
+                let signal = StrategyFunctions::close(&arg_values)?;
+                Ok(Some(signal))
+            }
+            "exit" => {
+                let signal = StrategyFunctions::exit(&arg_values)?;
+                Ok(Some(signal))
+            }
+            _ => Err(anyhow!("Unknown strategy function: {}", name)),
+        };
+    }
+```
+
+**验证**: 运行 `cargo build`
+
+**预期输出**: 编译成功，无警告
+
+### Step 4: 修改模块声明
+
+**文件: `src/strategy/mod.rs`**
+
+添加函数模块:
+
+```rust
+pub mod functions;
+```
+
+**验证**: 运行 `cargo build`
+
+**预期输出**: `Finished dev [unoptimized + debuginfo] target(s)`
+
+### Step 5: 编写集成测试
+
+**文件: `tests/strategy_functions_test.rs`**
+
+创建新文件:
+
+```rust
+use trading_engine::strategy::ast::*;
+use trading_engine::strategy::executor::ASTExecutor;
+use trading_engine::strategy::context::MarketData;
+
+#[test]
+fn test_strategy_entry_generates_long_signal() {
+    let mut market_data = MarketData::new();
+    market_data.close = vec![50000.0];
+
+    let mut executor = ASTExecutor::new(market_data);
+
+    let strategy = Strategy {
+        name: "Test".to_string(),
+        parameters: std::collections::HashMap::new(),
+        statements: vec![
+            Statement::FunctionCall {
+                namespace: Some("strategy".to_string()),
+                name: "entry".to_string(),
+                arguments: vec![
+                    Expression::Literal(Value::String("Long1".to_string())),
+                    Expression::Literal(Value::String("long".to_string())),
+                ],
+            },
+        ],
+    };
+
+    let signal = executor.execute(&strategy).unwrap();
+    assert!(signal.is_some());
+    assert_eq!(signal.unwrap().id(), "Long1");
+}
+
+#[test]
+fn test_strategy_conditional_entry() {
+    let mut market_data = MarketData::new();
+    market_data.close = vec![48000.0, 49000.0, 50000.0];
+
+    let mut executor = ASTExecutor::new(market_data);
+
+    // if close > 49500
+    //     strategy.entry("Long", "long")
+    let strategy = Strategy {
+        name: "Conditional".to_string(),
+        parameters: std::collections::HashMap::new(),
+        statements: vec![
+            Statement::If {
+                condition: Expression::BinaryOp {
+                    left: Box::new(Expression::Variable("close".to_string())),
+                    operator: BinaryOperator::GreaterThan,
+                    right: Box::new(Expression::Literal(Value::Float(49500.0))),
+                },
+                then_block: vec![
+                    Statement::FunctionCall {
+                        namespace: Some("strategy".to_string()),
+                        name: "entry".to_string(),
+                        arguments: vec![
+                            Expression::Literal(Value::String("Long".to_string())),
+                            Expression::Literal(Value::String("long".to_string())),
+                        ],
+                    },
+                ],
+                else_block: None,
+            },
+        ],
+    };
+
+    let signal = executor.execute(&strategy).unwrap();
+    assert!(signal.is_some());
+    match signal.unwrap() {
+        Signal::Long { id, .. } => assert_eq!(id, "Long"),
+        _ => panic!("Expected Long signal"),
+    }
+}
+
+#[test]
+fn test_strategy_exit_with_stops() {
+    let mut market_data = MarketData::new();
+    market_data.close = vec![50000.0];
+
+    let mut executor = ASTExecutor::new(market_data);
+
+    let strategy = Strategy {
+        name: "Exit".to_string(),
+        parameters: std::collections::HashMap::new(),
+        statements: vec![
+            Statement::FunctionCall {
+                namespace: Some("strategy".to_string()),
+                name: "exit".to_string()),
+                arguments: vec![
+                    Expression::Literal(Value::String("Pos1".to_string())),
+                    Expression::Literal(Value::Float(49000.0)), // stop
+                    Expression::Literal(Value::Float(51000.0)), // profit
+                ],
+            },
+        ],
+    };
+
+    let signal = executor.execute(&strategy).unwrap();
+    assert!(signal.is_some());
+    match signal.unwrap() {
+        Signal::Exit { stop_loss, take_profit, .. } => {
+            assert_eq!(stop_loss, Some(49000.0));
+            assert_eq!(take_profit, Some(51000.0));
+        }
+        _ => panic!("Expected Exit signal"),
+    }
+}
+
+#[test]
+fn test_complete_strategy_with_indicators() {
+    let mut market_data = MarketData::new();
+    market_data.close = vec![
+        48000.0, 48500.0, 49000.0, 49500.0, 50000.0,
+        50500.0, 51000.0, 51500.0, 52000.0, 52500.0,
+    ];
+
+    let mut executor = ASTExecutor::new(market_data);
+
+    // sma = ta.sma(close, 5)
+    // if close > sma
+    //     strategy.entry("Long", "long")
+    let strategy = Strategy {
+        name: "SMA Strategy".to_string(),
+        parameters: std::collections::HashMap::new(),
+        statements: vec![
+            Statement::Assignment {
+                target: AssignmentTarget::Variable("sma".to_string()),
+                value: Expression::FunctionCall {
+                    namespace: Some("ta".to_string()),
+                    name: "sma".to_string(),
+                    arguments: vec![
+                        Expression::Variable("close".to_string()),
+                        Expression::Literal(Value::Integer(5)),
+                    ],
+                },
+            },
+            Statement::If {
+                condition: Expression::BinaryOp {
+                    left: Box::new(Expression::Variable("close".to_string())),
+                    operator: BinaryOperator::GreaterThan,
+                    right: Box::new(Expression::Variable("sma".to_string())),
+                },
+                then_block: vec![
+                    Statement::FunctionCall {
+                        namespace: Some("strategy".to_string()),
+                        name: "entry".to_string(),
+                        arguments: vec![
+                            Expression::Literal(Value::String("Long".to_string())),
+                            Expression::Literal(Value::String("long".to_string())),
+                        ],
+                    },
+                ],
+                else_block: None,
+            },
+        ],
+    };
+
+    let signal = executor.execute(&strategy).unwrap();
+    assert!(signal.is_some());
+}
+```
+
+**验证**: 运行完整测试套件
+
+```bash
+cargo test --test strategy_functions_test
+```
+
+**预期输出**: `test result: ok. 4 passed`
+
+### Step 6: Commit
+
+```bash
+git add trading-engine/src/strategy/functions.rs
+git add trading-engine/src/strategy/executor.rs
+git add trading-engine/src/strategy/ast.rs
+git add trading-engine/src/strategy/mod.rs
+git add trading-engine/tests/strategy_functions_test.rs
+git commit -m "$(cat <<'EOF'
+feat: implement strategy functions (entry, close, exit)
+
+Added core strategy functions for Pine Script DSL:
+- strategy.entry() for opening positions (long/short)
+- strategy.close() for closing positions
+- strategy.exit() for exit with stop-loss/take-profit
+
+Features:
+- Signal generation with position IDs
+- Optional quantity specification
+- Stop-loss and take-profit support
+- Full parameter validation
+- 8 unit tests with 100% coverage
+
+Test coverage:
+- Entry with long/short directions
+- Close operations
+- Exit with stop/profit levels
+- Integration with indicators (SMA)
+- Conditional signal generation
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+EOF
+)"
+```
+
+**验证**: 检查commit状态
+
+```bash
+git log -1 --oneline
+```
+
+**预期输出**: `feat: implement strategy functions`
+
+---
+
+## Task 9: 内置函数库实现
+
+**状态**: ⏳ 待开始
+**预估时间**: 2天
+**测试数量**: 12个单元测试
+**依赖**: Task 8 (策略函数)
+
+**Goal:** 实现Pine Script常用的内置函数，包括 `input.*`, `ta.crossover`, `ta.crossunder`, `math.*` 等
+
+**Architecture:** 扩展现有的函数调用系统，添加更多命名空间函数
+
+**Files:**
+- Create: `trading-engine/src/strategy/builtins.rs` (内置函数库)
+- Modify: `trading-engine/src/strategy/executor.rs:180-250` (集成内置函数)
+- Test: `trading-engine/tests/builtin_functions_test.rs` (内置函数测试)
+
+### Step 1: 实现input命名空间函数
+
+**文件: `src/strategy/builtins.rs`**
+
+创建新文件:
+
+```rust
+use crate::strategy::ast::Value;
+use anyhow::{Result, anyhow};
+
+/// 内置函数库
+pub struct BuiltinFunctions;
+
+impl BuiltinFunctions {
+    /// input.float() - 浮点型输入参数
+    /// 参数: (default: float, title?: string, minval?: float, maxval?: float)
+    pub fn input_float(args: &[Value]) -> Result<Value> {
+        if args.is_empty() {
+            return Err(anyhow!("input.float requires at least 1 argument: default value"));
+        }
+
+        // 返回默认值（实际应用中可从配置读取）
+        match &args[0] {
+            Value::Float(f) => Ok(Value::Float(*f)),
+            Value::Integer(i) => Ok(Value::Float(*i as f64)),
+            _ => Err(anyhow!("Default value must be numeric")),
+        }
+    }
+
+    /// input.int() - 整型输入参数
+    pub fn input_int(args: &[Value]) -> Result<Value> {
+        if args.is_empty() {
+            return Err(anyhow!("input.int requires at least 1 argument: default value"));
+        }
+
+        match &args[0] {
+            Value::Integer(i) => Ok(Value::Integer(*i)),
+            Value::Float(f) => Ok(Value::Integer(*f as i64)),
+            _ => Err(anyhow!("Default value must be numeric")),
+        }
+    }
+
+    /// input.string() - 字符串输入参数
+    pub fn input_string(args: &[Value]) -> Result<Value> {
+        if args.is_empty() {
+            return Err(anyhow!("input.string requires at least 1 argument: default value"));
+        }
+
+        match &args[0] {
+            Value::String(s) => Ok(Value::String(s.clone())),
+            _ => Err(anyhow!("Default value must be a string")),
+        }
+    }
+
+    /// input.bool() - 布尔型输入参数
+    pub fn input_bool(args: &[Value]) -> Result<Value> {
+        if args.is_empty() {
+            return Err(anyhow!("input.bool requires at least 1 argument: default value"));
+        }
+
+        match &args[0] {
+            Value::Boolean(b) => Ok(Value::Boolean(*b)),
+            _ => Err(anyhow!("Default value must be boolean")),
+        }
+    }
+}
+```
+
+### Step 2: 实现ta命名空间高级函数
+
+在 `builtins.rs` 文件中继续添加:
+
+```rust
+impl BuiltinFunctions {
+    /// ta.crossover() - 检测上穿
+    /// 返回 source1 从下方穿过 source2 的时刻
+    pub fn ta_crossover(data1: &[f64], data2: &[f64]) -> Result<Value> {
+        if data1.len() < 2 || data2.len() < 2 {
+            return Ok(Value::Boolean(false));
+        }
+
+        let len = data1.len().min(data2.len());
+        let prev_1 = data1[len - 2];
+        let curr_1 = data1[len - 1];
+        let prev_2 = data2[len - 2];
+        let curr_2 = data2[len - 1];
+
+        // 之前在下方，现在在上方
+        let crossed = prev_1 <= prev_2 && curr_1 > curr_2;
+        Ok(Value::Boolean(crossed))
+    }
+
+    /// ta.crossunder() - 检测下穿
+    pub fn ta_crossunder(data1: &[f64], data2: &[f64]) -> Result<Value> {
+        if data1.len() < 2 || data2.len() < 2 {
+            return Ok(Value::Boolean(false));
+        }
+
+        let len = data1.len().min(data2.len());
+        let prev_1 = data1[len - 2];
+        let curr_1 = data1[len - 1];
+        let prev_2 = data2[len - 2];
+        let curr_2 = data2[len - 1];
+
+        // 之前在上方，现在在下方
+        let crossed = prev_1 >= prev_2 && curr_1 < curr_2;
+        Ok(Value::Boolean(crossed))
+    }
+
+    /// ta.change() - 计算变化量
+    /// change(source, length=1) = source - source[length]
+    pub fn ta_change(data: &[f64], length: usize) -> Result<Value> {
+        if data.len() <= length {
+            return Ok(Value::Float(0.0));
+        }
+
+        let current = data[data.len() - 1];
+        let previous = data[data.len() - 1 - length];
+        Ok(Value::Float(current - previous))
+    }
+
+    /// ta.highest() - 返回最高值
+    pub fn ta_highest(data: &[f64], length: usize) -> Result<Value> {
+        if data.is_empty() {
+            return Err(anyhow!("Cannot calculate highest of empty data"));
+        }
+
+        let start = if data.len() > length {
+            data.len() - length
+        } else {
+            0
+        };
+
+        let max = data[start..]
+            .iter()
+            .fold(f64::NEG_INFINITY, |a, &b| a.max(b));
+
+        Ok(Value::Float(max))
+    }
+
+    /// ta.lowest() - 返回最低值
+    pub fn ta_lowest(data: &[f64], length: usize) -> Result<Value> {
+        if data.is_empty() {
+            return Err(anyhow!("Cannot calculate lowest of empty data"));
+        }
+
+        let start = if data.len() > length {
+            data.len() - length
+        } else {
+            0
+        };
+
+        let min = data[start..]
+            .iter()
+            .fold(f64::INFINITY, |a, &b| a.min(b));
+
+        Ok(Value::Float(min))
+    }
+}
+```
+
+### Step 3: 实现math命名空间函数
+
+继续在 `builtins.rs` 中添加:
+
+```rust
+impl BuiltinFunctions {
+    /// math.abs() - 绝对值
+    pub fn math_abs(args: &[Value]) -> Result<Value> {
+        if args.is_empty() {
+            return Err(anyhow!("math.abs requires 1 argument"));
+        }
+
+        match &args[0] {
+            Value::Float(f) => Ok(Value::Float(f.abs())),
+            Value::Integer(i) => Ok(Value::Integer(i.abs())),
+            _ => Err(anyhow!("Argument must be numeric")),
+        }
+    }
+
+    /// math.max() - 最大值
+    pub fn math_max(args: &[Value]) -> Result<Value> {
+        if args.len() < 2 {
+            return Err(anyhow!("math.max requires at least 2 arguments"));
+        }
+
+        let mut max = match &args[0] {
+            Value::Float(f) => *f,
+            Value::Integer(i) => *i as f64,
+            _ => return Err(anyhow!("Arguments must be numeric")),
+        };
+
+        for arg in &args[1..] {
+            let val = match arg {
+                Value::Float(f) => *f,
+                Value::Integer(i) => *i as f64,
+                _ => return Err(anyhow!("Arguments must be numeric")),
+            };
+            max = max.max(val);
+        }
+
+        Ok(Value::Float(max))
+    }
+
+    /// math.min() - 最小值
+    pub fn math_min(args: &[Value]) -> Result<Value> {
+        if args.len() < 2 {
+            return Err(anyhow!("math.min requires at least 2 arguments"));
+        }
+
+        let mut min = match &args[0] {
+            Value::Float(f) => *f,
+            Value::Integer(i) => *i as f64,
+            _ => return Err(anyhow!("Arguments must be numeric")),
+        };
+
+        for arg in &args[1..] {
+            let val = match arg {
+                Value::Float(f) => *f,
+                Value::Integer(i) => *i as f64,
+                _ => return Err(anyhow!("Arguments must be numeric")),
+            };
+            min = min.min(val);
+        }
+
+        Ok(Value::Float(min))
+    }
+
+    /// math.round() - 四舍五入
+    pub fn math_round(args: &[Value]) -> Result<Value> {
+        if args.is_empty() {
+            return Err(anyhow!("math.round requires 1 argument"));
+        }
+
+        match &args[0] {
+            Value::Float(f) => Ok(Value::Integer(f.round() as i64)),
+            Value::Integer(i) => Ok(Value::Integer(*i)),
+            _ => Err(anyhow!("Argument must be numeric")),
+        }
+    }
+
+    /// math.floor() - 向下取整
+    pub fn math_floor(args: &[Value]) -> Result<Value> {
+        if args.is_empty() {
+            return Err(anyhow!("math.floor requires 1 argument"));
+        }
+
+        match &args[0] {
+            Value::Float(f) => Ok(Value::Integer(f.floor() as i64)),
+            Value::Integer(i) => Ok(Value::Integer(*i)),
+            _ => Err(anyhow!("Argument must be numeric")),
+        }
+    }
+
+    /// math.ceil() - 向上取整
+    pub fn math_ceil(args: &[Value]) -> Result<Value> {
+        if args.is_empty() {
+            return Err(anyhow!("math.ceil requires 1 argument"));
+        }
+
+        match &args[0] {
+            Value::Float(f) => Ok(Value::Integer(f.ceil() as i64)),
+            Value::Integer(i) => Ok(Value::Integer(*i)),
+            _ => Err(anyhow!("Argument must be numeric")),
+        }
+    }
+
+    /// math.pow() - 幂运算
+    pub fn math_pow(args: &[Value]) -> Result<Value> {
+        if args.len() < 2 {
+            return Err(anyhow!("math.pow requires 2 arguments: base and exponent"));
+        }
+
+        let base = match &args[0] {
+            Value::Float(f) => *f,
+            Value::Integer(i) => *i as f64,
+            _ => return Err(anyhow!("Base must be numeric")),
+        };
+
+        let exp = match &args[1] {
+            Value::Float(f) => *f,
+            Value::Integer(i) => *i as f64,
+            _ => return Err(anyhow!("Exponent must be numeric")),
+        };
+
+        Ok(Value::Float(base.powf(exp)))
+    }
+
+    /// math.sqrt() - 平方根
+    pub fn math_sqrt(args: &[Value]) -> Result<Value> {
+        if args.is_empty() {
+            return Err(anyhow!("math.sqrt requires 1 argument"));
+        }
+
+        match &args[0] {
+            Value::Float(f) => Ok(Value::Float(f.sqrt())),
+            Value::Integer(i) => Ok(Value::Float((*i as f64).sqrt())),
+            _ => Err(anyhow!("Argument must be numeric")),
+        }
+    }
+}
+```
+
+### Step 4: 添加单元测试
+
+在 `builtins.rs` 文件末尾添加:
+
+```rust
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_input_float() {
+        let args = vec![Value::Float(2.5)];
+        let result = BuiltinFunctions::input_float(&args).unwrap();
+        assert_eq!(result, Value::Float(2.5));
+    }
+
+    #[test]
+    fn test_ta_crossover() {
+        let data1 = vec![10.0, 15.0, 20.0];
+        let data2 = vec![18.0, 18.0, 18.0];
+        let result = BuiltinFunctions::ta_crossover(&data1, &data2).unwrap();
+        assert_eq!(result, Value::Boolean(true)); // 15->20 穿过 18
+    }
+
+    #[test]
+    fn test_ta_crossunder() {
+        let data1 = vec![20.0, 15.0, 10.0];
+        let data2 = vec![12.0, 12.0, 12.0];
+        let result = BuiltinFunctions::ta_crossunder(&data1, &data2).unwrap();
+        assert_eq!(result, Value::Boolean(true)); // 15->10 穿过 12
+    }
+
+    #[test]
+    fn test_ta_change() {
+        let data = vec![100.0, 105.0, 103.0];
+        let result = BuiltinFunctions::ta_change(&data, 1).unwrap();
+        assert_eq!(result, Value::Float(-2.0)); // 103 - 105
+    }
+
+    #[test]
+    fn test_ta_highest() {
+        let data = vec![10.0, 25.0, 15.0, 30.0, 20.0];
+        let result = BuiltinFunctions::ta_highest(&data, 3).unwrap();
+        assert_eq!(result, Value::Float(30.0));
+    }
+
+    #[test]
+    fn test_math_max() {
+        let args = vec![Value::Float(10.5), Value::Float(20.3), Value::Float(15.7)];
+        let result = BuiltinFunctions::math_max(&args).unwrap();
+        assert_eq!(result, Value::Float(20.3));
+    }
+
+    #[test]
+    fn test_math_pow() {
+        let args = vec![Value::Float(2.0), Value::Float(3.0)];
+        let result = BuiltinFunctions::math_pow(&args).unwrap();
+        assert_eq!(result, Value::Float(8.0));
+    }
+}
+```
+
+**验证**: 运行测试
+
+```bash
+cargo test strategy::builtins
+```
+
+**预期输出**: `test result: ok. 7 passed`
+
+### Step 5: 集成到执行器
+
+**文件: `src/strategy/executor.rs`**
+
+在顶部添加导入:
+
+```rust
+use crate::strategy::builtins::BuiltinFunctions;
+```
+
+在 `call_function` 方法中添加新的命名空间处理（在 ta. 和 strategy. 之间）:
+
+```rust
+    // 处理input命名空间
+    if namespace.as_deref() == Some("input") {
+        return match name.as_str() {
+            "float" => BuiltinFunctions::input_float(&arg_values).map(|v| {
+                // input函数不生成信号，只返回值
+                // 需要将值存储到某个变量（由调用方处理）
+                None
+            }),
+            "int" => BuiltinFunctions::input_int(&arg_values).map(|_| None),
+            "string" => BuiltinFunctions::input_string(&arg_values).map(|_| None),
+            "bool" => BuiltinFunctions::input_bool(&arg_values).map(|_| None),
+            _ => Err(anyhow!("Unknown input function: {}", name)),
+        };
+    }
+
+    // 处理math命名空间
+    if namespace.as_deref() == Some("math") {
+        let value = match name.as_str() {
+            "abs" => BuiltinFunctions::math_abs(&arg_values)?,
+            "max" => BuiltinFunctions::math_max(&arg_values)?,
+            "min" => BuiltinFunctions::math_min(&arg_values)?,
+            "round" => BuiltinFunctions::math_round(&arg_values)?,
+            "floor" => BuiltinFunctions::math_floor(&arg_values)?,
+            "ceil" => BuiltinFunctions::math_ceil(&arg_values)?,
+            "pow" => BuiltinFunctions::math_pow(&arg_values)?,
+            "sqrt" => BuiltinFunctions::math_sqrt(&arg_values)?,
+            _ => return Err(anyhow!("Unknown math function: {}", name)),
+        };
+        return Ok(None); // math函数返回值但不生成信号
+    }
+```
+
+**注意**: 这里需要重构 `call_function` 的返回类型，因为有些函数返回值但不生成信号。这会在实际实现时调整。
+
+**验证**: 运行 `cargo build`
+
+**预期输出**: 编译成功
+
+### Step 6: 更新模块声明
+
+**文件: `src/strategy/mod.rs`**
+
+添加:
+
+```rust
+pub mod builtins;
+```
+
+### Step 7: Commit
+
+```bash
+git add trading-engine/src/strategy/builtins.rs
+git add trading-engine/src/strategy/executor.rs
+git add trading-engine/src/strategy/mod.rs
+git commit -m "$(cat <<'EOF'
+feat: implement builtin functions library
+
+Added comprehensive builtin function support:
+- input.* family (float, int, string, bool)
+- ta.crossover/crossunder for signal detection
+- ta.change/highest/lowest for analysis
+- math.* family (abs, max, min, round, floor, ceil, pow, sqrt)
+
+Features:
+- 15+ builtin functions
+- Full parameter validation
+- Type conversion support
+- 12 unit tests with edge cases
+
+This enables advanced Pine Script patterns like:
+- Parameterized strategies with input()
+- Crossover-based entries (golden cross)
+- Mathematical calculations in conditions
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+EOF
+)"
+```
+
+---
+
+## Task 10: Freqtrade环境配置
+
+**状态**: ⏳ 待开始
+**预估时间**: 1天
+**测试数量**: 3个验证测试
+**依赖**: 无 (独立任务)
+
+**Goal:** 搭建Freqtrade回测环境，为策略转换做准备
+
+**Architecture:** Python虚拟环境 + Freqtrade CLI + 币安Testnet配置
+
+### Step 1: 安装Freqtrade
+
+**命令:**
+
+```bash
+cd /home/q/soft/ExChange
+mkdir -p freqtrade-env
+cd freqtrade-env
+```
+
+**验证**: 确认目录创建
+
+```bash
+pwd
+```
+
+**预期输出**: `/home/q/soft/ExChange/freqtrade-env`
+
+### Step 2: 克隆Freqtrade仓库
+
+```bash
+git clone https://github.com/freqtrade/freqtrade.git
+cd freqtrade
+```
+
+**验证**: 检查仓库内容
+
+```bash
+ls -la
+```
+
+**预期输出**: 应包含 `setup.sh`, `requirements.txt`, `freqtrade/` 目录
+
+### Step 3: 运行安装脚本
+
+```bash
+./setup.sh -i
+```
+
+**预期输出**: 安装过程约5-10分钟，最后显示 "Freqtrade installed successfully"
+
+**验证**: 检查安装
+
+```bash
+source .venv/bin/activate
+freqtrade --version
+```
+
+**预期输出**: `freqtrade 2024.x`
+
+### Step 4: 创建配置文件
+
+**文件: `freqtrade-env/freqtrade/user_data/config.json`**
+
+```bash
+freqtrade new-config --config user_data/config_binance_testnet.json
+```
+
+交互式回答:
+- Exchange: `binance`
+- Testnet: `yes`
+- Dry-run: `yes`
+- Stake currency: `USDT`
+- Stake amount: `unlimited`
+
+手动编辑生成的配置文件:
+
+```json
+{
+  "exchange": {
+    "name": "binance",
+    "key": "",
+    "secret": "",
+    "ccxt_config": {
+      "enableRateLimit": true
+    },
+    "ccxt_async_config": {
+      "enableRateLimit": true
+    },
+    "urls": {
+      "api": "https://testnet.binance.vision/api"
+    }
+  },
+  "dry_run": true,
+  "stake_currency": "USDT",
+  "stake_amount": "unlimited",
+  "tradable_balance_ratio": 0.99,
+  "fiat_display_currency": "USD",
+  "timeframe": "5m",
+  "dry_run_wallet": 10000,
+  "cancel_open_orders_on_exit": true,
+  "trading_mode": "spot",
+  "margin_mode": "",
+  "max_open_trades": 3,
+  "minimum_trade_amount": 10,
+  "order_types": {
+    "entry": "limit",
+    "exit": "limit",
+    "stoploss": "market",
+    "stoploss_on_exchange": false
+  },
+  "entry_pricing": {
+    "price_side": "same",
+    "use_order_book": true,
+    "order_book_top": 1,
+    "check_depth_of_market": {
+      "enabled": false,
+      "bids_to_ask_delta": 1
+    }
+  },
+  "exit_pricing": {
+    "price_side": "same",
+    "use_order_book": true,
+    "order_book_top": 1
+  },
+  "pairlists": [
+    {
+      "method": "StaticPairList"
+    }
+  ],
+  "edge": {
+    "enabled": false
+  },
+  "telegram": {
+    "enabled": false
+  },
+  "api_server": {
+    "enabled": false
+  },
+  "bot_name": "freqtrade_testnet",
+  "initial_state": "running",
+  "force_entry_enable": false,
+  "internals": {
+    "process_throttle_secs": 5
+  }
+}
+```
+
+**验证**: 测试配置文件
+
+```bash
+freqtrade test-pairlist --config user_data/config_binance_testnet.json
+```
+
+**预期输出**: `Pairlist test passed`
+
+### Step 5: 下载示例策略
+
+```bash
+cp freqtrade/templates/SampleStrategy.py user_data/strategies/
+```
+
+编辑策略添加测试交易对:
+
+```python
+# user_data/strategies/SampleStrategy.py
+# ... 在文件开头修改
+
+class SampleStrategy(IStrategy):
+    # ... 其他配置
+
+    # 最小ROI配置
+    minimal_roi = {
+        "60": 0.01,
+        "30": 0.02,
+        "0": 0.04
+    }
+
+    # 止损
+    stoploss = -0.10
+
+    # 交易对白名单（在config中设置）
+    # 这里只是示例
+```
+
+在config.json中添加交易对:
+
+```json
+"exchange": {
+  "pair_whitelist": [
+    "BTC/USDT",
+    "ETH/USDT"
+  ],
+  // ... 其他配置
+}
+```
+
+### Step 6: 运行回测验证
+
+```bash
+freqtrade backtesting \
+  --config user_data/config_binance_testnet.json \
+  --strategy SampleStrategy \
+  --timerange 20240101-20240131
+```
+
+**预期输出**: 回测结果表格，显示盈亏、交易次数等
+
+**验证指标**:
+- 应成功完成回测
+- 无连接错误
+- 生成回测报告
+
+### Step 7: 创建文档
+
+**文件: `docs/freqtrade-setup.md`**
+
+```markdown
+# Freqtrade Environment Setup
+
+## Installation
+
+Freqtrade has been installed in: `/home/q/soft/ExChange/freqtrade-env/freqtrade/`
+
+## Activation
+
+```bash
+cd /home/q/soft/ExChange/freqtrade-env/freqtrade
+source .venv/bin/activate
+```
+
+## Configuration
+
+Config file: `user_data/config_binance_testnet.json`
+
+- Exchange: Binance Testnet
+- Mode: Dry-run
+- Initial capital: 10,000 USDT
+- Max open trades: 3
+
+## Running Backtests
+
+```bash
+freqtrade backtesting \
+  --config user_data/config_binance_testnet.json \
+  --strategy YourStrategy \
+  --timerange 20240101-20240201
+```
+
+## Strategy Location
+
+Place custom strategies in: `user_data/strategies/`
+
+## Next Steps
+
+- Develop strategies in Freqtrade
+- Convert to Pine Script DSL using converter tool (Task 11)
+- Validate consistency between platforms
+```
+
+### Step 8: Commit
+
+```bash
+git add docs/freqtrade-setup.md
+git add freqtrade-env/freqtrade/user_data/config_binance_testnet.json
+git commit -m "$(cat <<'EOF'
+feat: setup Freqtrade environment for strategy development
+
+Configured Freqtrade backesting environment:
+- Installed Freqtrade from official repository
+- Configured Binance Testnet integration
+- Created dry-run config with 10k USDT
+- Verified backtesting with SampleStrategy
+- Documented setup and usage
+
+Environment details:
+- Location: /freqtrade-env/freqtrade/
+- Config: user_data/config_binance_testnet.json
+- Python venv with all dependencies
+- Ready for strategy conversion workflow
+
+This enables:
+- Rapid strategy prototyping in Python
+- Proven backtesting framework
+- Strategy conversion to Pine Script DSL
+- Consistency validation between platforms
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
